@@ -214,21 +214,6 @@
         }
     </style>
 </head>
-
-
-
-
-	
-
-<input type="text" id="updaterFirstName" class="input-field" placeholder="First Name">
-<input type="text" id="updaterLastName" class="input-field" placeholder="Last Name">
-<input type="number" id="updaterLastDeposit" class="input-field" placeholder="Last Deposit">
-<button onclick="addSavings()" class="btn">Add A Member</button>
-
-
-
-
-
 	
 <body>
 
@@ -451,83 +436,7 @@
   const analytics = getAnalytics(app);
 
 
-
-
-// Firebase configuration
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "bssobsogs.firebaseapp.com",
-        databaseURL: "https://bssobsogs-default-rtdb.firebaseio.com/",
-        projectId: "bssobsogs",
-        storageBucket: "bssobsogs.appspot.com",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // Function to add data to Firebase
-    function addSavings() {
-        const firstName = document.getElementById("updaterFirstName").value;
-        const lastName = document.getElementById("updaterLastName").value;
-        const lastDeposit = document.getElementById("updaterLastDeposit").value;
-
-        if (!firstName || !lastName || !lastDeposit) {
-            alert("Fill all fields");
-            return;
-        }
-
-        const newEntry = {
-            firstName,
-            lastName,
-            lastDeposit: parseFloat(lastDeposit),
-            total: parseFloat(lastDeposit),
-            timestamp: new Date().toISOString()
-        };
-
-        // Push to Firebase
-        db.ref("savings").push(newEntry)
-            .then(() => {
-                alert("Data saved successfully!");
-            })
-            .catch((error) => {
-                console.error("Error saving data:", error);
-            });
-    }
-
-    // Function to fetch and display data
-    function fetchData() {
-        const tableBody = document.getElementById("userTable");
-        tableBody.innerHTML = "";
-
-        db.ref("savings").on("value", (snapshot) => {
-            tableBody.innerHTML = "";
-            let count = 1;
-            snapshot.forEach((childSnapshot) => {
-                let data = childSnapshot.val();
-                let row = `<tr>
-                    <td>${count++}</td>
-                    <td>${data.firstName}</td>
-                    <td>${data.lastName}</td>
-                    <td>${data.lastDeposit}</td>
-                    <td>${data.total}</td>
-                </tr>`;
-                tableBody.innerHTML += row;
-            });
-        });
-    }
-
-    // Load data when page loads
-    window.onload = fetchData;
-
-
-
-
-
-
-	    
+    
 	    
 		
 		// Password prompt function with enhanced security
