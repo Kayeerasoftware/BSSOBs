@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+	<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+
+	
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Savings System</title>
@@ -406,6 +411,22 @@
         savingsData[index].total += lastDeposit;
         savingsData[index].lastDepositChanged = false;
         updateTables();
+
+
+
+	    // Firebase configuration
+    const firebaseConfig = {
+        databaseURL: "https://bssobsogs-default-rtdb.firebaseio.com/"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Test fetching data
+    db.ref("/").once("value")
+        .then(snapshot => console.log(snapshot.val()))
+        .catch(error => console.error("Error fetching data:", error));
 
 
 
