@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1d4ed8;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            background-color: #3b82f6;
+            padding: 14px 30px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs button:hover {
+            background-color: #2563eb;
+            transform: translateY(-4px);
+        }
+
+        .tabs button:active {
+            transform: translateY(2px);
+        }
+
+        /* New active button style */
+        .tabs button.active {
+            background-color: #2563eb;
+            transform: scale(1.1);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .active-tab {
+            display: block;
+        }
+
+        .tab-header {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            background-color: #3b82f6;
+            color: white;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-4px);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .editable {
+            background-color: #fef2f2;
+            border-radius: 4px;
+            padding: 6px;
+            cursor: pointer;
+        }
+
+        .editable:hover {
+            background-color: #ffed4a;
+        }
+
+        .update-button {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .update-pending {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .update-completed {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                font-size: 1.5rem;
+                padding: 20px 0;
+            }
+
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .tabs button {
+                margin-bottom: 15px;
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
+
+            .input-field {
+                padding: 12px;
+            }
+
+            .table th,
+            .table td {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 12px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    BUNYA SS CLASS OF 2014-2015 OBs/OGs Saving Group Managment System
+</header>
+
+<main class="container mx-auto p-6 my-8">
+    <div class="tabs">
+        <button onclick="showTab('userTab', this)" class="btn">Omuboni</button>
+        <button onclick="showTab('updaterTab', this)" class="btn">Omuwanika</button>
+        <button onclick="showTab('adminTab', this)" class="btn">Ssenkulu</button>
+    </div>
+
+    <!-- User Tab -->
+    <div id="userTab" class="tab-content active-tab">
+        <h2 class="tab-header">Bona Bona Babone</h2>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sn</th>
+                        <th>Elina Elisoka</th>
+                        <th>Elina Elyokibili</th>
+                        <th>Akawunti</th>
+                        <th>Edhakati</th>
+                        <th>Omughendho</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Updater Tab -->
+    <div id="updaterTab" class="tab-content">
+        <h2 class="tab-header">Omughanika</h2>
+        <div>
+            <input type="text" id="updaterFirstName" class="input-field" placeholder="First Name">
+            <input type="text" id="updaterLastName" class="input-field" placeholder="Last Name">
+            <input type="number" id="updaterLastDeposit" class="input-field" placeholder="Last Deposit">
+            <button onclick="addSavings('updater')" class="btn">Add A Member</button>
+        </div>
+        <div class="table-container">
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th>Sn</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Account</th>
+                        <th>Last Deposit</th>
+                        <th>Total</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody id="updaterTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Admin Tab -->
+    <div id="adminTab" class="tab-content">
+        <h2 class="tab-header">Ssenkulu</h2>
+        <div>
+            <input type="text" id="adminFirstName" class="input-field" placeholder="First Name">
+            <input type="text" id="adminLastName" class="input-field" placeholder="Last Name">
+            <input type="number" id="adminLastDeposit" class="input-field" placeholder="Last Deposit">
+            <button onclick="addSavings('admin')" class="btn">Add A Member</button>
+        </div>
+        <div class="table-container">
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th>Sn</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Account</th>
+                        <th>Last Deposit</th>
+                        <th>Total</th>
+                        <th>Update</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTable"></tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script>
+    let savingsData = [];
+
+    function showTab(tabId, button) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+        document.getElementById(tabId).classList.add('active-tab');
+
+        document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        updateTables();
+    }
+
+    function updateTables() {
+        let tables = ['userTable', 'updaterTable', 'adminTable'];
+        tables.forEach(id => document.getElementById(id).innerHTML = '');
+
+        savingsData.forEach((data, index) => {
+            let row = `<tr>
+                        <td>${data.sn}</td>
+                        <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
+                        <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
+                        <td>${data.account}</td>
+                        <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
+                        <td>${data.total}</td>
+                        <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+                    </tr>`;
+
+            document.getElementById('userTable').innerHTML += row;
+            document.getElementById('updaterTable').innerHTML += row;
+            document.getElementById('adminTable').innerHTML += row + `<td><button onclick="deleteRecord(${index})" class="btn btn-danger">Delete</button></td>`;
+        });
+    }
+
+    function isEditable(field, index) {
+        return field === 'firstName' || field === 'lastName' || field === 'lastDeposit';
+    }
+
+    function addSavings(role) {
+        let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
+        let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
+        let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
+
+        if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
+            alert('Please fill in all fields with valid data!');
+            return;
+        }
+
+        let newEntry = { 
+            sn: savingsData.length + 1, 
+            firstName, 
+            lastName, 
+            account: Math.floor(100000 + Math.random() * 900000), 
+            lastDeposit: parseFloat(lastDeposit), 
+            total: parseFloat(lastDeposit),
+            lastDepositChanged: false
+        };
+
+        savingsData.push(newEntry);
+        updateTables();
+
+        if (role === 'updater') {
+            document.getElementById('updaterFirstName').value = '';
+            document.getElementById('updaterLastName').value = '';
+            document.getElementById('updaterLastDeposit').value = '';
+        } else {
+            document.getElementById('adminFirstName').value = '';
+            document.getElementById('adminLastName').value = '';
+            document.getElementById('adminLastDeposit').value = '';
+        }
+    }
+
+    function deleteRecord(index) {
+        if (document.getElementById('adminTab').classList.contains('hidden')) return;
+        savingsData.splice(index, 1); 
+        updateTables(); 
+    }
+
+    function updateData(index, field, value) {
+        savingsData[index][field] = value;
+        updateTables();
+    }
+
+    function updateDeposit(index, value) {
+        if (isNaN(value) || parseFloat(value) < 0) return;
+        savingsData[index].lastDeposit = parseFloat(value);
+        savingsData[index].lastDepositChanged = true;
+        updateTables();
+    }
+
+    function updateTotal(index) {
+        if (!savingsData[index].lastDepositChanged) {
+            alert("No changes detected in Last Deposit.");
+            return;
+        }
+
+        let lastDeposit = savingsData[index].lastDeposit;
+        savingsData[index].total += lastDeposit;
+        savingsData[index].lastDepositChanged = false;
+        updateTables();
+		
+		
+		// Password prompt function with enhanced security
+function promptForPassword(role) {
+    const validPassword = 'yourPassword'; // predefined password (this can be hashed in production)
+    const minLength = 8; // Minimum password length
+    const maxAttempts = 3; // Maximum attempts before denying access
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // RegEx to enforce password standards
+
+    let attempts = 3;
+    let password = kayeera;
+
+    while (attempts < maxAttempts) {
+        password = prompt("Please enter your password:");
+
+        // Check if the password meets the security standards
+        if (password.length >= minLength && passwordRegex.test(password)) {
+            // Check if password matches the valid password
+            if (password === validPassword) {
+                return true;
+            } else {
+                alert("Incorrect password. Please try again.");
+                attempts++;
+            }
+        } else {
+            alert("Password must meet the following criteria:\n- At least 8 characters\n- Includes at least one lowercase letter, one uppercase letter, one number, and one special character");
+            attempts++;
+        }
+
+        // Deny access after max attempts
+        if (attempts >= maxAttempts) {
+            alert("Too many incorrect attempts. Action denied.");
+            return false;
+        }
+    }
+}
+
+		
+    }
+</script>
+
+</body>
+</html>
