@@ -404,62 +404,67 @@
         savingsData[index].lastDepositChanged = false;
         updateTables();
 		
-		
-		
-		
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwWz4adIaAMoQI3DVrSZ4DQdbDQ_mzj_lq8Q49UoV4Sl0i5B2YiAcVt8_6-MReFdque/exec"; // Replace with your script URL
 
-    function addSavings(role) {
-        let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
-        let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
-        let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
 
-        if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
-            alert('Please fill in all fields with valid data!');
-            return;
+
+	    
+	const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrioXB7luBfjesJ2WBMdaOwYPiGSKj37qaTYkzjIDRmW05xWl74_ZOJDnlj3fdW0U8/exec"; // Replace with your actual URL
+
+function sendToGoogleSheet(entry) {
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(entry),
+        headers: {
+            "Content-Type": "application/json"
         }
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log("Data saved:", data);
+        alert("Data successfully saved to Google Sheets!");
+    })
+    .catch(error => console.error("Error:", error));
+}
 
-        let newEntry = { 
-            firstName, 
-            lastName, 
-            account: Math.floor(100000 + Math.random() * 900000), 
-            lastDeposit: parseFloat(lastDeposit), 
-            total: parseFloat(lastDeposit)
-        };
+// Modify addSavings function to send data:
+function addSavings(role) {
+    let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
+    let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
+    let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
 
-        fetch(GOOGLE_SHEET_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newEntry)
-        }).then(() => {
-            alert("Data added successfully!");
-            fetchSavingsData();
-        });
+    if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
+        alert('Please fill in all fields with valid data!');
+        return;
     }
 
-    function fetchSavingsData() {
-        fetch(GOOGLE_SHEET_URL)
-            .then(response => response.json())
-            .then(data => {
-                let tableBody = document.getElementById('userTable');
-                tableBody.innerHTML = "";
-                data.forEach((row, index) => {
-                    let tableRow = `<tr>
-                        <td>${index + 1}</td>
-                        <td>${row[0]}</td>
-                        <td>${row[1]}</td>
-                        <td>${row[2]}</td>
-                        <td>${row[3]}</td>
-                        <td>${row[4]}</td>
-                    </tr>`;
-                    tableBody.innerHTML += tableRow;
-                });
-            });
-    }
+    let newEntry = { 
+        sn: savingsData.length + 1, 
+        firstName, 
+        lastName, 
+        account: Math.floor(100000 + Math.random() * 900000), 
+        lastDeposit: parseFloat(lastDeposit), 
+        total: parseFloat(lastDeposit),
+        lastDepositChanged: false
+    };
 
-    document.addEventListener("DOMContentLoaded", fetchSavingsData);
+    savingsData.push(newEntry);
+    updateTables();
+    sendToGoogleSheet(newEntry); // Save to Google Sheets
+
+    // Clear form
+    if (role === 'updater') {
+        document.getElementById('updaterFirstName').value = '';
+        document.getElementById('updaterLastName').value = '';
+        document.getElementById('updaterLastDeposit').value = '';
+    } else {
+        document.getElementById('adminFirstName').value = '';
+        document.getElementById('adminLastName').value = '';
+        document.getElementById('adminLastDeposit').value = '';
+    }
+}
+	
 		
+
 		
 		
 		
