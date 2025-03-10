@@ -377,6 +377,53 @@
         }
     }
 
+
+
+	function saveDataToLocalStorage() {
+    localStorage.setItem('savingsData', JSON.stringify(savingsData));
+}
+
+function loadDataFromLocalStorage() {
+    const storedData = localStorage.getItem('savingsData');
+    if (storedData) {
+        savingsData = JSON.parse(storedData);
+        updateTables();
+    }
+}
+
+// Call this function on page load
+window.onload = loadDataFromLocalStorage;
+
+// Modify `addSavings` to save after adding data
+function addSavings(role) {
+    let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
+    let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
+    let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
+
+    if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
+        alert('Please fill in all fields with valid data!');
+        return;
+    }
+
+    let newEntry = { 
+        sn: savingsData.length + 1, 
+        firstName, 
+        lastName, 
+        account: Math.floor(100000 + Math.random() * 900000), 
+        lastDeposit: parseFloat(lastDeposit), 
+        total: parseFloat(lastDeposit),
+        lastDepositChanged: false
+    };
+
+    savingsData.push(newEntry);
+    saveDataToLocalStorage(); // Save to local storage
+    updateTables();
+}
+
+
+
+	
+
     function deleteRecord(index) {
         if (document.getElementById('adminTab').classList.contains('hidden')) return;
         savingsData.splice(index, 1); 
@@ -426,25 +473,22 @@ function updateDeposit(index, value) {
 
 
 	    
-	const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzrioXB7luBfjesJ2WBMdaOwYPiGSKj37qaTYkzjIDRmW05xWl74_ZOJDnlj3fdW0U8/exec"; // Replace with your actual URL
+function sendDataToGoogleSheets(data) {
+    const googleSheetURL = "https://script.google.com/macros/s/AKfycbzJvDwqL2X5mWLbqybrr9rH4hDUipBECXvsv7lJRtO5jBAl3yjEJacFnkh9hd6X4x0s/exec"; // Replace with your script's URL
 
-function sendToGoogleSheet(entry) {
-    fetch(GOOGLE_SCRIPT_URL, {
+    fetch(googleSheetURL, {
         method: "POST",
-        body: JSON.stringify(entry),
+        mode: "no-cors",
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify(data)
     })
-    .then(response => response.text())
-    .then(data => {
-        console.log("Data saved:", data);
-        alert("Data successfully saved to Google Sheets!");
-    })
-    .catch(error => console.error("Error:", error));
+    .then(() => console.log("Data sent to Google Sheets"))
+    .catch(error => console.error("Error sending data:", error));
 }
 
-// Modify addSavings function to send data:
+// Modify `addSavings` to include sending data to Google Sheets
 function addSavings(role) {
     let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
     let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
@@ -466,19 +510,10 @@ function addSavings(role) {
     };
 
     savingsData.push(newEntry);
+    saveDataToLocalStorage();
     updateTables();
-    sendToGoogleSheet(newEntry); // Save to Google Sheets
 
-    // Clear form
-    if (role === 'updater') {
-        document.getElementById('updaterFirstName').value = '';
-        document.getElementById('updaterLastName').value = '';
-        document.getElementById('updaterLastDeposit').value = '';
-    } else {
-        document.getElementById('adminFirstName').value = '';
-        document.getElementById('adminLastName').value = '';
-        document.getElementById('adminLastDeposit').value = '';
-    }
+    sendDataToGoogleSheets(newEntry); // Send data to Google Sheets
 }
 	
 		
