@@ -360,26 +360,30 @@ function addSavings(tab) {
         updateTables();
     }
 
-    function updateTables() {
-        let tables = ['userTable', 'updaterTable', 'adminTable'];
-        tables.forEach(id => document.getElementById(id).innerHTML = '');
+	function updateTables() {
+    // Clear existing data from each table
+    document.getElementById('userTable').innerHTML = '';
+    document.getElementById('updaterTable').innerHTML = '';
+    document.getElementById('adminTable').innerHTML = '';
 
-        savingsData.forEach((data, index) => {
-            let row = `<tr>
-                        <td>${data.sn}</td>
-                        <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
-                        <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
-                        <td>${data.account}</td>
-                        <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
-                        <td>${data.total}</td>
-                        <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
-                    </tr>`;
+    savingsData.forEach((data, index) => {
+        let row = `<tr>
+                    <td>${data.sn}</td>
+                    <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
+                    <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
+                    <td>${data.account}</td>
+                    <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
+                    <td>${data.total}</td>
+                    <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+                </tr>`;
 
-            document.getElementById('userTable').innerHTML += row;
-            document.getElementById('updaterTable').innerHTML += row;
-            document.getElementById('adminTable').innerHTML += row + `<td><button onclick="deleteRecord(${index})" class="btn btn-danger">Delete</button></td>`;
-        });
-    }
+        // Add row to the userTable, updaterTable, and adminTable respectively
+        document.getElementById('userTable').innerHTML += row;
+        document.getElementById('updaterTable').innerHTML += row;
+        document.getElementById('adminTable').innerHTML += row + `<td><button onclick="deleteRecord(${index})" class="btn btn-danger">Delete</button></td>`;
+    });
+}
+
 
     function isEditable(field, index) {
         return field === 'firstName' || field === 'lastName' || field === 'lastDeposit';
