@@ -350,15 +350,15 @@ function addSavings(tab) {
     }
 }
 
-    function showTab(tabId, button) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
-        document.getElementById(tabId).classList.add('active-tab');
+function showTab(tabId, button) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+    document.getElementById(tabId).classList.add('active-tab');
 
-        document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
+    document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
 
-        updateTables();
-    }
+    updateTables();
+}
 
 	function updateTables() {
     // Clear existing data from each table
