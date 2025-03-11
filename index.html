@@ -43,7 +43,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
+	    
         .tabs button:hover {
             background-color: #2563eb;
             transform: translateY(-4px);
@@ -389,7 +389,7 @@ console.log(generateAccountNumber()); // Example output: BSSOB/G453X
                         <td contenteditable="true" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
                         <td>${data.total}</td>
                    </tr>`;
-
+			<td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
         let adminRow = row; // Start with the same row
 
         // Add delete button only for the Admin table
