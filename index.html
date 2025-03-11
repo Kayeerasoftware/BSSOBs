@@ -345,6 +345,66 @@
         savingsData.forEach((data, index) => {
             let row = `<tr>
                         <td>${data.sn}</td>
+                        <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
+                        <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
+                        <td>${data.account}</td>
+                        <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
+                        <td>${data.total}</td>
+                        <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+                    </tr>`;
+
+            document.getElementById('userTable').innerHTML += row;
+            document.getElementById('updaterTable').innerHTML += row;
+            document.getElementById('adminTable').innerHTML += row + `<td><button onclick="deleteRecord(${index})" class="btn btn-danger">Delete</button></td>`;
+        });
+    }
+
+    function isEditable(field, index) {
+        return field === 'firstName' || field === 'lastName' || field === 'lastDeposit';
+    }
+
+    function addSavings(role) {
+        let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
+        let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
+        let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
+
+        if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
+            alert('Please fill in all fields with valid data!');
+            return;
+        }
+
+        let newEntry = { 
+            sn: savingsData.length + 1, 
+            firstName, 
+            lastName, 
+            account: Math.floor(100000 + Math.random() * 900000), 
+            lastDeposit: parseFloat(lastDeposit), 
+            total: parseFloat(lastDeposit),
+            lastDepositChanged: false
+    };
+
+        savingsData.push(newEntry);
+        updateTables();
+
+        if (role === 'updater') {
+            document.getElementById('updaterFirstName').value = '';
+            document.getElementById('updaterLastName').value = '';
+            document.getElementById('updaterLastDeposit').value = '';
+        } else {
+            document.getElementById('adminFirstName').value = '';
+            document.getElementById('adminLastName').value = '';
+            document.getElementById('adminLastDeposit').value = '';
+        }
+    }
+
+
+    function updateTables() {
+        let tables = ['userTable', 'updaterTable', 'adminTable'];
+        tables.forEach(id => document.getElementById(id).innerHTML = '');
+
+        savingsData.forEach((data, index) => {
+            let row = `<tr>
+                        <td>${data.sn}</td>
                         <td contenteditable="true" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
                         <td contenteditable="true" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
                         <td>${data.account}</td>
