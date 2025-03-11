@@ -337,33 +337,39 @@
         });
     }
 
-    function addSavings(role) {
-        let firstName = document.getElementById(`${role}FirstName`).value;
-        let lastName = document.getElementById(`${role}LastName`).value;
-        let lastDeposit = document.getElementById(`${role}LastDeposit`).value;
+function addSavings(role) {
+    let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
+    let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
+    let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
 
-        if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
-            alert('Please enter valid data!');
-            return;
-        }
-
-        let newEntry = { 
-            sn: savingsData.length + 1, 
-            firstName, 
-            lastName, 
-            account: generateAccountNumber(), 
-            lastDeposit: parseFloat(lastDeposit), 
-            total: parseFloat(lastDeposit),
-            lastDepositChanged: false
-        };
-
-        savingsData.push(newEntry);
-        updateTables();
-
-        document.getElementById(`${role}FirstName`).value = '';
-        document.getElementById(`${role}LastName`).value = '';
-        document.getElementById(`${role}LastDeposit`).value = '';
+    if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
+        alert('Please fill in all fields with valid data!');
+        return;
     }
+
+    let newEntry = { 
+        sn: savingsData.length + 1, 
+        firstName, 
+        lastName, 
+        account: generateAccountNumber(), 
+        lastDeposit: parseFloat(lastDeposit), 
+        total: parseFloat(lastDeposit),
+        lastDepositChanged: false
+    };
+
+    savingsData.push(newEntry);
+    updateTables();
+
+    if (role === 'updater') {
+        document.getElementById('updaterFirstName').value = '';
+        document.getElementById('updaterLastName').value = '';
+        document.getElementById('updaterLastDeposit').value = '';
+    } else {
+        document.getElementById('adminFirstName').value = '';
+        document.getElementById('adminLastName').value = '';
+        document.getElementById('adminLastDeposit').value = '';
+    }
+}
 
     function generateAccountNumber() {
         let randomDigits = Math.floor(100 + Math.random() * 900); // Three-digit number
