@@ -363,30 +363,31 @@
         updateTables();
     }
 
-    function updateTables() {
-        // Clear existing data from each table
-        document.getElementById('userTable').innerHTML = '';
-        document.getElementById('updaterTable').innerHTML = '';
-        document.getElementById('adminTable').innerHTML = '';
+   function updateTables() {
+    document.getElementById('userTable').innerHTML = '';
+    document.getElementById('updaterTable').innerHTML = '';
+    document.getElementById('adminTable').innerHTML = '';
 
-        // Render data for each tab
-        savingsData.forEach((data, index) => {
-            let row = `<tr>
-                        <td>${data.sn}</td>
-                        <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
-                        <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
-                        <td>${data.account}</td>
-                        <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
-                        <td>${data.total}</td>
-                        <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
-                    </tr>`;
+    savingsData.forEach((data, index) => {
+        let row = `<tr>
+            <td>${index + 1}</td>
+            <td>${data.firstName}</td>
+            <td>${data.lastName}</td>
+            <td>${data.account}</td>
+            <td>${data.lastDeposit}</td>
+            <td>${data.total}</td>
+            <td>
+                <button onclick="deleteEntry(${index})" class="btn btn-danger">Delete</button>
+            </td>
+        </tr>`;
 
-            // Add the row to the user, updater, and admin tables
-            document.getElementById('userTable').innerHTML += row;
-            document.getElementById('updaterTable').innerHTML += row;
-            document.getElementById('adminTable').innerHTML += row + `<td><button onclick="deleteRecord(${index})" class="btn btn-danger">Delete</button></td>`;
-        });
-    }
+        document.getElementById('userTable').innerHTML += row;
+        document.getElementById('updaterTable').innerHTML += row;
+        document.getElementById('adminTable').innerHTML += row;
+    });
+}
+
+        
 
     // Check if the field should be editable
     function isEditable(field, index) {
@@ -424,45 +425,6 @@ function deleteEntry(index) {
     localStorage.setItem("savingsData", JSON.stringify(savingsData));
 
     updateTables();
-}
-
-	
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxhsQ0ueEm0vgmJEGQcL_1X8gJyMTNALq_342ItL5zRvwfQ46bxbQeNSxwotJSAJPs/exec"; // Replace with your actual Apps Script URL
-
-// Fetch Data from Google Sheet
-async function fetchData() {
-    let response = await fetch(GOOGLE_SHEET_URL);
-    let data = await response.json();
-    renderTable(data);
-}
-
-// Send Data to Google Sheet
-async function sendDataToGoogleSheet(newEntry) {
-    await fetch(GOOGLE_SHEET_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newEntry)
-    });
-    fetchData(); // Refresh data after sending
-}
-
-// Render Data in Table
-function renderTable(data) {
-    let tableBody = document.getElementById("userTable");
-    tableBody.innerHTML = "";
-
-    data.slice(1).forEach((row, index) => {
-        let tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${row[0]}</td>
-            <td>${row[1]}</td>
-            <td>${row[2]}</td>
-            <td>${row[3]}</td>
-            <td>${row[4]}</td>
-            <td>${row[5]}</td>
-        `;
-        tableBody.appendChild(tr);
-    });
 }
 
 function saveDataToLocalStorage() {
