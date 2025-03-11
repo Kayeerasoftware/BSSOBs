@@ -318,14 +318,16 @@
 
 <script>
     let savingsData = [];
-    function showTab(tabId, button) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
-        document.getElementById(tabId).classList.add('active-tab');
+	function showTab(tabId, button) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+    document.getElementById(tabId).style.display = 'block';
 
-        document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
+    document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
 
-        updateTables();
+    updateTables();
+}
+
     }
 
     function updateTables() {
@@ -353,39 +355,42 @@
         return field === 'firstName' || field === 'lastName' || field === 'lastDeposit';
     }
 
-    function addSavings(role) {
-        let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
-        let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
-        let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
+	function addSavings(role) {
+    let firstName = role === 'updater' ? document.getElementById('updaterFirstName').value : document.getElementById('adminFirstName').value;
+    let lastName = role === 'updater' ? document.getElementById('updaterLastName').value : document.getElementById('adminLastName').value;
+    let lastDeposit = role === 'updater' ? document.getElementById('updaterLastDeposit').value : document.getElementById('adminLastDeposit').value;
 
-        if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
-            alert('Please fill in all fields with valid data!');
-            return;
-        }
+    if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
+        alert('Please fill in all fields with valid data!');
+        return;
+    }
 
-        let newEntry = { 
-            sn: savingsData.length + 1, 
-            firstName, 
-            lastName, 
-            account: Math.floor(100000 + Math.random() * 900000), 
-            lastDeposit: parseFloat(lastDeposit), 
-            total: parseFloat(lastDeposit),
-            lastDepositChanged: false
+    let newEntry = { 
+        sn: savingsData.length + 1, 
+        firstName, 
+        lastName, 
+        account: Math.floor(100000 + Math.random() * 900000), 
+        lastDeposit: parseFloat(lastDeposit), 
+        total: parseFloat(lastDeposit),
+        lastDepositChanged: false
     };
 
-        savingsData.push(newEntry);
-        updateTables();
+    savingsData.push(newEntry);
+    updateTables(); 
 
-        if (role === 'updater') {
-            document.getElementById('updaterFirstName').value = '';
-            document.getElementById('updaterLastName').value = '';
-            document.getElementById('updaterLastDeposit').value = '';
-        } else {
-            document.getElementById('adminFirstName').value = '';
-            document.getElementById('adminLastName').value = '';
-            document.getElementById('adminLastDeposit').value = '';
-        }
+    // Clear the input fields after adding
+    if (role === 'updater') {
+        document.getElementById('updaterFirstName').value = '';
+        document.getElementById('updaterLastName').value = '';
+        document.getElementById('updaterLastDeposit').value = '';
+    } else if (role === 'admin') {
+        document.getElementById('adminFirstName').value = '';
+        document.getElementById('adminLastName').value = '';
+        document.getElementById('adminLastDeposit').value = '';
     }
+
+    alert("Member added successfully!");
+}
 
 
     function updateTables() {
