@@ -375,7 +375,7 @@ console.log(generateAccountNumber()); // Example output: BSSOB/G453X
         updateTables();
     }
 
-   function updateTables() {
+ function updateTables() {
     document.getElementById('userTable').innerHTML = '';
     document.getElementById('updaterTable').innerHTML = '';
     document.getElementById('adminTable').innerHTML = '';
@@ -383,23 +383,29 @@ console.log(generateAccountNumber()); // Example output: BSSOB/G453X
     savingsData.forEach((data, index) => {
         let row = `<tr>
                         <td>${data.sn}</td>
-                        <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
-                        <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
+                        <td contenteditable="true" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
+                        <td contenteditable="true" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
                         <td>${data.account}</td>
-                        <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
+                        <td contenteditable="true" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
                         <td>${data.total}</td>
-            <td>
-           	<td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
-	    	<button onclick="deleteEntry(${index})" class="btn btn-danger">Delete</button>
-	    </td>
-        </tr>`;
+                   </tr>`;
 
+        let adminRow = row; // Start with the same row
+
+        // Add delete button only for the Admin table
+        adminRow = `<tr>
+                        ${row}
+                        <td>
+                            <button onclick="deleteEntry(${index})" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>`;
+
+        // Append rows to respective tables
         document.getElementById('userTable').innerHTML += row;
         document.getElementById('updaterTable').innerHTML += row;
-        document.getElementById('adminTable').innerHTML += row;
+        document.getElementById('adminTable').innerHTML += adminRow; // Only admin has delete
     });
 }
-
         
 
     // Check if the field should be editable
@@ -439,13 +445,19 @@ function updateDeposit(index, newDeposit) {
         updateTables();
     }
 
+// Function to delete an entry (only Admin should have access)
 function deleteEntry(index) {
-    savingsData.splice(index, 1);
-    
-    // Save updated data to localStorage
-    localStorage.setItem("savingsData", JSON.stringify(savingsData));
+    if (confirm("Are you sure you want to delete this record?")) {
+        savingsData.splice(index, 1);
+        
+        // Reassign serial numbers (Sn) to maintain order
+        savingsData.forEach((data, i) => data.sn = i + 1);
 
-    updateTables();
+        // Save updated data
+        localStorage.setItem("savingsData", JSON.stringify(savingsData));
+        
+        updateTables();
+    }
 }
 
 function saveDataToLocalStorage() {
