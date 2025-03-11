@@ -388,6 +388,8 @@ console.log(generateAccountNumber()); // Example output: BSSOB/G453X
                         <td>${data.account}</td>
                         <td contenteditable="true" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
                         <td>${data.total}</td>
+			<td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+
                    </tr>`;
         let adminRow = row; // Start with the same row
 
