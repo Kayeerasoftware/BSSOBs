@@ -518,7 +518,92 @@ function addSavings(role) {
 	
 		
 
-		
+
+
+
+
+
+	
+    let savingsData = [];
+
+    function showTab(tabId, button) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+        document.getElementById(tabId).classList.add('active-tab');
+
+        document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        updateTables();
+    }
+
+    function updateTables() {
+        let tables = ['userTable', 'updaterTable', 'adminTable'];
+        tables.forEach(id => document.getElementById(id).innerHTML = '');
+
+        savingsData.forEach((data, index) => {
+            let row = `<tr>
+                        <td>${data.sn}</td>
+                        <td contenteditable="true" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
+                        <td contenteditable="true" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
+                        <td>${data.account}</td>
+                        <td contenteditable="true" onblur="updateDeposit(${index}, this.innerText)" class="editable">${formatNumber(data.lastDeposit)}</td>
+                        <td>${formatNumber(data.total)}</td>
+                        <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+                    </tr>`;
+
+            tables.forEach(id => document.getElementById(id).innerHTML += row);
+        });
+    }
+
+    function addSavings(role) {
+        let firstName = document.getElementById(`${role}FirstName`).value;
+        let lastName = document.getElementById(`${role}LastName`).value;
+        let lastDeposit = document.getElementById(`${role}LastDeposit`).value;
+
+        if (!firstName || !lastName || !lastDeposit || isNaN(lastDeposit) || lastDeposit <= 0) {
+            alert('Please enter valid data!');
+            return;
+        }
+
+        let newEntry = { 
+            sn: savingsData.length + 1, 
+            firstName, 
+            lastName, 
+            account: generateAccountNumber(), 
+            lastDeposit: parseFloat(lastDeposit), 
+            total: parseFloat(lastDeposit),
+            lastDepositChanged: false
+        };
+
+        savingsData.push(newEntry);
+        updateTables();
+
+        document.getElementById(`${role}FirstName`).value = '';
+        document.getElementById(`${role}LastName`).value = '';
+        document.getElementById(`${role}LastDeposit`).value = '';
+    }
+
+    function generateAccountNumber() {
+        let randomDigits = Math.floor(100 + Math.random() * 900); // Three-digit number
+        let randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Random uppercase letter
+        return `BSSOB/G${randomDigits}${randomLetter}`;
+    }
+
+    function formatNumber(number) {
+        return Number(number).toLocaleString(); // Adds commas
+    }
+
+    function updateDeposit(index, value) {
+        let numValue = parseFloat(value.replace(/,/g, ''));
+        if (!isNaN(numValue)) {
+            savingsData[index].lastDeposit = numValue;
+            updateTables();
+        }
+    }
+
+
+
+	
 		
 		
 		// Password prompt function with enhanced security
