@@ -464,11 +464,20 @@ function renderTable(data) {
     });
 }
 
+function saveDataToLocalStorage() {
+    localStorage.setItem('savingsData', JSON.stringify(savingsData));
+}
 
+function loadDataFromLocalStorage() {
+    const storedData = localStorage.getItem('savingsData');
+    if (storedData) {
+        savingsData = JSON.parse(storedData);
+        updateTables();
+    }
+}
 
-// Load Data on Page Load
-window.onload = fetchData;
-
+// Call this function on page load
+window.onload = loadDataFromLocalStorage;
 
 </script>
 
