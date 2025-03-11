@@ -327,10 +327,10 @@
             sn: savingsData.length + 1, 
             firstName, 
             lastName, 
-            account: Math.floor(100000 + Math.random() * 900000), 
+            account: generateAccountNumber(), 
             lastDeposit: parseFloat(lastDeposit), 
             total: parseFloat(lastDeposit),
-            lastDepositChanged: false
+            lastDepositChanged: true
     };
 
     savingsData.push(newEntry);
@@ -351,6 +351,16 @@
             document.getElementById("adminLastDeposit").value = '';
         }
     }
+
+
+	function generateAccountNumber() {
+    let randomDigits = Math.floor(100 + Math.random() * 900); // Ensures 3 digits (100-999)
+    let randomLetter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Random A-Z
+    return `BSSOB/G${randomDigits}${randomLetter}`;
+}
+
+// Example usage
+console.log(generateAccountNumber()); // Example output: BSSOB/G453X
 
     function showTab(tabId, button) {
         // Hide all tabs and remove active class from all buttons
