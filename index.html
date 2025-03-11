@@ -409,16 +409,24 @@ console.log(generateAccountNumber()); // Example output: BSSOB/G453X
 
     function updateData(index, field, value) {
         savingsData[index][field] = value;
+	localStorage.setItem("savingsData", JSON.stringify(savingsData));
         updateTables();
     }
 
-    function updateDeposit(index, value) {
-        if (isNaN(value) || parseFloat(value) < 0) return;
-        savingsData[index].lastDeposit = parseFloat(value);
-        savingsData[index].lastDepositChanged = true;
-        updateTables();
+function updateDeposit(index, newDeposit) {
+    let depositAmount = parseFloat(newDeposit);
+    
+    if (isNaN(depositAmount) || depositAmount <= 0) {
+        alert("Invalid deposit amount.");
+        updateTables(); // Refresh to remove incorrect input
+        return;
     }
 
+    savingsData[index].lastDeposit = depositAmount;
+    savingsData[index].total += depositAmount; // Update total savings
+    localStorage.setItem("savingsData", JSON.stringify(savingsData)); // Save updated data
+    updateTables();
+}
     function updateTotal(index) {
         if (!savingsData[index].lastDepositChanged) {
             alert("No changes detected in Last Deposit.");
