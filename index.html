@@ -224,11 +224,6 @@
 
 <main class="container mx-auto p-6 my-8">
 
-
-
-
-
-	
 	<select id="userRole" onchange="setPermissions()">
     <option value="viewer">Viewer</option>
     <option value="updater">Updater</option>
@@ -239,10 +234,6 @@
 <button id="editBtn" onclick="editEntry()">Edit Entry</button>
 <button id="deleteBtn" onclick="deleteEntry()">Delete Entry</button>
 
-
-
-
-	
 	<div class="tabs">
         <button onclick="showTab('userTab', this)" class="btn">Omuboni</button>
         <button onclick="showTab('updaterTab', this)" class="btn">Omuwanika</button>
@@ -476,13 +467,6 @@ function addSavings(role) {
             updateTables();
         }
     }
-
-
-
-
-
-
-
 	function editEntry() {
     let role = document.getElementById("userRole").value;
     if (role !== "admin" && role !== "updater") {
@@ -508,13 +492,6 @@ function addSavings(role) {
     entry.total += parseFloat(newDeposit);
     updateTables();
 }
-
-
-
-
-
-
-	
 
 	function saveDataToLocalStorage() {
     localStorage.setItem('savingsData', JSON.stringify(savingsData));
@@ -557,10 +534,6 @@ function addSavings(role) {
     updateTables();
 }
 
-
-
-	
-
     function deleteRecord(index) {
         if (document.getElementById('adminTab').classList.contains('hidden')) return;
         savingsData.splice(index, 1); 
@@ -585,8 +558,6 @@ function addSavings(role) {
     savingsData.splice(index, 1);
     updateTables();
 }
-
-
     function updateDeposit(index, value) {
         if (isNaN(value) || parseFloat(value) < 0) return;
         savingsData[index].lastDeposit = parseFloat(value);
@@ -610,7 +581,6 @@ function addSavings(role) {
    savingsData[index][field] = value;
    updateTables();
 }
-
 function updateDeposit(index, value) {
    if (!isNaN(value) && value > 0) {
        savingsData[index].lastDeposit = parseFloat(value);
@@ -620,10 +590,6 @@ function updateDeposit(index, value) {
        alert('Invalid deposit amount');
    }
 }
-		
-
-
-
 	    
 function sendDataToGoogleSheets(data) {
     const googleSheetURL = "https://script.google.com/macros/s/AKfycbyQKilk6JVea7DQCfcN4Styx3juyC4rIdDHqFSPMFw7PDyhnyVrbg6c6ZwNnLi57cuB/exec"; // Replace with your script's URL
@@ -667,62 +633,10 @@ function addSavings(role) {
 
     sendDataToGoogleSheets(newEntry); // Send data to Google Sheets
 }
-	
-		
 
-
-
-function setPermissions() {
-    let role = document.getElementById("userRole").value;
-    
-    document.getElementById("addBtn").style.display = (role === "admin" || role === "updater") ? "block" : "none";
-    document.getElementById("editBtn").style.display = (role === "admin" || role === "updater") ? "block" : "none";
-    document.getElementById("deleteBtn").style.display = (role === "admin") ? "block" : "none";
-}
 
 // Call this function on page load to apply permissions initially
 window.onload = setPermissions;
-
-
-
-	    
-	
-		
-		
-		// Password prompt function with enhanced security
-function promptForPassword(role) {
-    const validPassword = 'yourPassword'; // predefined password (this can be hashed in production)
-    const minLength = 8; // Minimum password length
-    const maxAttempts = 3; // Maximum attempts before denying access
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // RegEx to enforce password standards
-
-    let attempts = 3;
-    let password = kayeera;
-
-    while (attempts < maxAttempts) {
-        password = prompt("Please enter your password:");
-
-        // Check if the password meets the security standards
-        if (password.length >= minLength && passwordRegex.test(password)) {
-            // Check if password matches the valid password
-            if (password === validPassword) {
-                return true;
-            } else {
-                alert("Incorrect password. Please try again.");
-                attempts++;
-            }
-        } else {
-            alert("Password must meet the following criteria:\n- At least 8 characters\n- Includes at least one lowercase letter, one uppercase letter, one number, and one special character");
-            attempts++;
-        }
-
-        // Deny access after max attempts
-        if (attempts >= maxAttempts) {
-            alert("Too many incorrect attempts. Action denied.");
-            return false;
-        }
-    }
-}
 
 		
     }
