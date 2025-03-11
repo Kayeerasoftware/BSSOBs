@@ -305,43 +305,40 @@
 <script>
  let savingsData = [];
 
-    // Add New Entry
-    function addSavings(tab) {
-        let firstName, lastName, lastDeposit;
-        
-        // Get input values based on the selected tab
-        if (tab === 'updater') {
-            firstName = document.getElementById("updaterFirstName").value;
-            lastName = document.getElementById("updaterLastName").value;
-            lastDeposit = parseFloat(document.getElementById("updaterLastDeposit").value);
-        } else if (tab === 'admin') {
-            firstName = document.getElementById("adminFirstName").value;
-            lastName = document.getElementById("adminLastName").value;
-            lastDeposit = parseFloat(document.getElementById("adminLastDeposit").value);
-        }
+   function addSavings(tab) {
+    let firstName, lastName, lastDeposit;
 
-        // Validate input
-        if (!firstName || !lastName || isNaN(lastDeposit) || lastDeposit <= 0) {
-            alert("Please enter valid data.");
-            return;
-        }
+    if (tab === 'updater') {
+        firstName = document.getElementById("updaterFirstName").value;
+        lastName = document.getElementById("updaterLastName").value;
+        lastDeposit = parseFloat(document.getElementById("updaterLastDeposit").value);
+    } else if (tab === 'admin') {
+        firstName = document.getElementById("adminFirstName").value;
+        lastName = document.getElementById("adminLastName").value;
+        lastDeposit = parseFloat(document.getElementById("adminLastDeposit").value);
+    }
 
-        // Create new entry object
-        let newEntry = {
-            sn: Math.floor(Math.random() * 10000),
-            firstName,
-            lastName,
-            account: Math.floor(100000 + Math.random() * 900000),
-            lastDeposit,
-            total: lastDeposit
-        };
+    if (!firstName || !lastName || isNaN(lastDeposit) || lastDeposit <= 0) {
+        alert("Please enter valid data.");
+        return;
+    }
 
-        // Add the new member to savingsData
-        savingsData.push(newEntry);
-        
-        // Update tables after adding a member
-        updateTables();
-        
+    let newEntry = {
+        sn: Math.floor(Math.random() * 10000),
+        firstName,
+        lastName,
+        account: Math.floor(100000 + Math.random() * 900000),
+        lastDeposit,
+        total: lastDeposit
+    };
+
+    savingsData.push(newEntry);
+    
+    // Save to localStorage
+    localStorage.setItem("savingsData", JSON.stringify(savingsData));
+    
+    updateTables();
+ 
         // Clear input fields after adding a member
         if (tab === 'updater') {
             document.getElementById("updaterFirstName").value = '';
@@ -420,10 +417,14 @@
         updateTables();
     }
 
-    function deleteRecord(index) {
-        savingsData.splice(index, 1); 
-        updateTables(); 
-    }
+function deleteEntry(index) {
+    savingsData.splice(index, 1);
+    
+    // Save updated data to localStorage
+    localStorage.setItem("savingsData", JSON.stringify(savingsData));
+
+    updateTables();
+}
 
 	
 const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxhsQ0ueEm0vgmJEGQcL_1X8gJyMTNALq_342ItL5zRvwfQ46bxbQeNSxwotJSAJPs/exec"; // Replace with your actual Apps Script URL
@@ -478,6 +479,15 @@ function loadDataFromLocalStorage() {
 
 // Call this function on page load
 window.onload = loadDataFromLocalStorage;
+	// Load data from localStorage
+window.onload = function () {
+    let storedData = localStorage.getItem("savingsData");
+    if (storedData) {
+        savingsData = JSON.parse(storedData);
+    }
+    updateTables();
+};
+
 
 </script>
 
