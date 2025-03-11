@@ -303,90 +303,126 @@
 </main>
 
 <script>
-    let savingsData = [];
-	// Add New Entry
-function addSavings(tab) {
-    let firstName, lastName, lastDeposit;
-    
-    if (tab === 'updater') {
-        firstName = document.getElementById("updaterFirstName").value;
-        lastName = document.getElementById("updaterLastName").value;
-        lastDeposit = parseFloat(document.getElementById("updaterLastDeposit").value);
-    } else if (tab === 'admin') {
-        firstName = document.getElementById("adminFirstName").value;
-        lastName = document.getElementById("adminLastName").value;
-        lastDeposit = parseFloat(document.getElementById("adminLastDeposit").value);
+ let savingsData = [];
+
+    // Add New Entry
+    function addSavings(tab) {
+        let firstName, lastName, lastDeposit;
+        
+        // Get input values based on the selected tab
+        if (tab === 'updater') {
+            firstName = document.getElementById("updaterFirstName").value;
+            lastName = document.getElementById("updaterLastName").value;
+            lastDeposit = parseFloat(document.getElementById("updaterLastDeposit").value);
+        } else if (tab === 'admin') {
+            firstName = document.getElementById("adminFirstName").value;
+            lastName = document.getElementById("adminLastName").value;
+            lastDeposit = parseFloat(document.getElementById("adminLastDeposit").value);
+        }
+
+        // Validate input
+        if (!firstName || !lastName || isNaN(lastDeposit) || lastDeposit <= 0) {
+            alert("Please enter valid data.");
+            return;
+        }
+
+        // Create new entry object
+        let newEntry = {
+            sn: Math.floor(Math.random() * 10000),
+            firstName,
+            lastName,
+            account: Math.floor(100000 + Math.random() * 900000),
+            lastDeposit,
+            total: lastDeposit
+        };
+
+        // Add the new member to savingsData
+        savingsData.push(newEntry);
+        
+        // Update tables after adding a member
+        updateTables();
+        
+        // Clear input fields after adding a member
+        if (tab === 'updater') {
+            document.getElementById("updaterFirstName").value = '';
+            document.getElementById("updaterLastName").value = '';
+            document.getElementById("updaterLastDeposit").value = '';
+        } else if (tab === 'admin') {
+            document.getElementById("adminFirstName").value = '';
+            document.getElementById("adminLastName").value = '';
+            document.getElementById("adminLastDeposit").value = '';
+        }
     }
 
-    if (!firstName || !lastName || isNaN(lastDeposit) || lastDeposit <= 0) {
-        alert("Please enter valid data.");
-        return;
+    function showTab(tabId, button) {
+        // Hide all tabs and remove active class from all buttons
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+        document.getElementById(tabId).classList.add('active-tab');
+        
+        document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // Update the table to reflect the current data in the active tab
+        updateTables();
     }
 
-    let newEntry = {
-        sn: Math.floor(Math.random() * 10000),
-        firstName,
-        lastName,
-        account: Math.floor(100000 + Math.random() * 900000),
-        lastDeposit,
-        total: lastDeposit
-    };
+    function updateTables() {
+        // Clear existing data from each table
+        document.getElementById('userTable').innerHTML = '';
+        document.getElementById('updaterTable').innerHTML = '';
+        document.getElementById('adminTable').innerHTML = '';
 
-    // Add the new member to savingsData
-    savingsData.push(newEntry);
-    
-    // Update tables after adding a member
-    updateTables();
-    
-    // Optionally, clear the input fields
-    if (tab === 'updater') {
-        document.getElementById("updaterFirstName").value = '';
-        document.getElementById("updaterLastName").value = '';
-        document.getElementById("updaterLastDeposit").value = '';
-    } else if (tab === 'admin') {
-        document.getElementById("adminFirstName").value = '';
-        document.getElementById("adminLastName").value = '';
-        document.getElementById("adminLastDeposit").value = '';
+        // Render data for each tab
+        savingsData.forEach((data, index) => {
+            let row = `<tr>
+                        <td>${data.sn}</td>
+                        <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
+                        <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
+                        <td>${data.account}</td>
+                        <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
+                        <td>${data.total}</td>
+                        <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+                    </tr>`;
+
+            // Add the row to the user, updater, and admin tables
+            document.getElementById('userTable').innerHTML += row;
+            document.getElementById('updaterTable').innerHTML += row;
+            document.getElementById('adminTable').innerHTML += row + `<td><button onclick="deleteRecord(${index})" class="btn btn-danger">Delete</button></td>`;
+        });
     }
-}
 
-function showTab(tabId, button) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
-    document.getElementById(tabId).classList.add('active-tab');
-
-    document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-
-    updateTables();
-}
-
-	function updateTables() {
-    // Clear existing data from each table
-    document.getElementById('userTable').innerHTML = '';
-    document.getElementById('updaterTable').innerHTML = '';
-    document.getElementById('adminTable').innerHTML = '';
-
-    savingsData.forEach((data, index) => {
-        let row = `<tr>
-                    <td>${data.sn}</td>
-                    <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
-                    <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
-                    <td>${data.account}</td>
-                    <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
-                    <td>${data.total}</td>
-                    <td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
-                </tr>`;
-
-        // Add row to the userTable, updaterTable, and adminTable respectively
-        document.getElementById('userTable').innerHTML += row;
-        document.getElementById('updaterTable').innerHTML += row;
-        document.getElementById('adminTable').innerHTML += row + `<td><button onclick="deleteRecord(${index})" class="btn btn-danger">Delete</button></td>`;
-    });
-}
-
-
+    // Check if the field should be editable
     function isEditable(field, index) {
         return field === 'firstName' || field === 'lastName' || field === 'lastDeposit';
+    }
+
+    function updateData(index, field, value) {
+        savingsData[index][field] = value;
+        updateTables();
+    }
+
+    function updateDeposit(index, value) {
+        if (isNaN(value) || parseFloat(value) < 0) return;
+        savingsData[index].lastDeposit = parseFloat(value);
+        savingsData[index].lastDepositChanged = true;
+        updateTables();
+    }
+
+    function updateTotal(index) {
+        if (!savingsData[index].lastDepositChanged) {
+            alert("No changes detected in Last Deposit.");
+            return;
+        }
+
+        let lastDeposit = savingsData[index].lastDeposit;
+        savingsData[index].total += lastDeposit;
+        savingsData[index].lastDepositChanged = false;
+        updateTables();
+    }
+
+    function deleteRecord(index) {
+        savingsData.splice(index, 1); 
+        updateTables(); 
     }
 
 	
@@ -433,37 +469,6 @@ function renderTable(data) {
 // Load Data on Page Load
 window.onload = fetchData;
 
-
-
-    function deleteRecord(index) {
-        if (document.getElementById('adminTab').classList.contains('hidden')) return;
-        savingsData.splice(index, 1); 
-        updateTables(); 
-    }
-
-    function updateData(index, field, value) {
-        savingsData[index][field] = value;
-        updateTables();
-    }
-
-    function updateDeposit(index, value) {
-        if (isNaN(value) || parseFloat(value) < 0) return;
-        savingsData[index].lastDeposit = parseFloat(value);
-        savingsData[index].lastDepositChanged = true;
-        updateTables();
-    }
-
-    function updateTotal(index) {
-        if (!savingsData[index].lastDepositChanged) {
-            alert("No changes detected in Last Deposit.");
-            return;
-        }
-
-        let lastDeposit = savingsData[index].lastDeposit;
-        savingsData[index].total += lastDeposit;
-        savingsData[index].lastDepositChanged = false;
-        updateTables();
-		
 
 </script>
 
