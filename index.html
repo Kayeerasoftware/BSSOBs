@@ -138,7 +138,6 @@
             background-color: #2563eb;
             transform: translateY(-4px);
         }
-
         .btn:active {
             transform: translateY(2px);
         }
@@ -305,6 +304,51 @@
 
 <script>
     let savingsData = [];
+	// Add New Entry
+function addSavings(tab) {
+    let firstName, lastName, lastDeposit;
+    
+    if (tab === 'updater') {
+        firstName = document.getElementById("updaterFirstName").value;
+        lastName = document.getElementById("updaterLastName").value;
+        lastDeposit = parseFloat(document.getElementById("updaterLastDeposit").value);
+    } else if (tab === 'admin') {
+        firstName = document.getElementById("adminFirstName").value;
+        lastName = document.getElementById("adminLastName").value;
+        lastDeposit = parseFloat(document.getElementById("adminLastDeposit").value);
+    }
+
+    if (!firstName || !lastName || isNaN(lastDeposit) || lastDeposit <= 0) {
+        alert("Please enter valid data.");
+        return;
+    }
+
+    let newEntry = {
+        sn: Math.floor(Math.random() * 10000),
+        firstName,
+        lastName,
+        account: Math.floor(100000 + Math.random() * 900000),
+        lastDeposit,
+        total: lastDeposit
+    };
+
+    // Add the new member to savingsData
+    savingsData.push(newEntry);
+    
+    // Update tables after adding a member
+    updateTables();
+    
+    // Optionally, clear the input fields
+    if (tab === 'updater') {
+        document.getElementById("updaterFirstName").value = '';
+        document.getElementById("updaterLastName").value = '';
+        document.getElementById("updaterLastDeposit").value = '';
+    } else if (tab === 'admin') {
+        document.getElementById("adminFirstName").value = '';
+        document.getElementById("adminLastName").value = '';
+        document.getElementById("adminLastDeposit").value = '';
+    }
+}
 
     function showTab(tabId, button) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
@@ -380,27 +424,7 @@ function renderTable(data) {
     });
 }
 
-// Add New Entry
-function addSavings() {
-    let firstName = document.getElementById("updaterFirstName").value;
-    let lastName = document.getElementById("updaterLastName").value;
-    let lastDeposit = parseFloat(document.getElementById("updaterLastDeposit").value);
-    if (!firstName || !lastName || isNaN(lastDeposit) || lastDeposit <= 0) {
-        alert("Please enter valid data.");
-        return;
-    }
 
-    let newEntry = {
-        sn: Math.floor(Math.random() * 10000),
-        firstName,
-        lastName,
-        account: Math.floor(100000 + Math.random() * 900000),
-        lastDeposit,
-        total: lastDeposit
-    };
-
-    sendDataToGoogleSheet(newEntry);
-}
 
 // Load Data on Page Load
 window.onload = fetchData;
