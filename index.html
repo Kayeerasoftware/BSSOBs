@@ -64,7 +64,7 @@
             display: none;
             padding: 20px;
         }
-
+	    
         .active-tab {
             display: block;
         }
@@ -378,7 +378,8 @@
             <td>${data.total}</td>
             <td>
                 <button onclick="deleteEntry(${index})" class="btn btn-danger">Delete</button>
-            </td>
+           	<td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+	    </td>
         </tr>`;
 
         document.getElementById('userTable').innerHTML += row;
