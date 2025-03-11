@@ -223,7 +223,27 @@
 </header>
 
 <main class="container mx-auto p-6 my-8">
-    <div class="tabs">
+
+
+
+
+
+	
+	<select id="userRole" onchange="setPermissions()">
+    <option value="viewer">Viewer</option>
+    <option value="updater">Updater</option>
+    <option value="admin">Admin</option>
+</select>
+
+<button id="addBtn" onclick="addSavings()">Add Entry</button>
+<button id="editBtn" onclick="editEntry()">Edit Entry</button>
+<button id="deleteBtn" onclick="deleteEntry()">Delete Entry</button>
+
+
+
+
+	
+	<div class="tabs">
         <button onclick="showTab('userTab', this)" class="btn">Omuboni</button>
         <button onclick="showTab('updaterTab', this)" class="btn">Omuwanika</button>
         <button onclick="showTab('adminTab', this)" class="btn">Ssenkulu</button>
@@ -391,6 +411,43 @@ function addSavings(role) {
 
 
 
+
+
+
+
+	function editEntry() {
+    let role = document.getElementById("userRole").value;
+    if (role !== "admin" && role !== "updater") {
+        alert("You don't have permission to edit!");
+        return;
+    }
+
+    let sn = prompt("Enter Serial Number (SN) of the entry to edit:");
+    let entry = savingsData.find(item => item.sn == sn);
+
+    if (!entry) {
+        alert("Entry not found!");
+        return;
+    }
+
+    let newDeposit = prompt("Enter new deposit amount:");
+    if (isNaN(newDeposit) || newDeposit <= 0) {
+        alert("Invalid amount!");
+        return;
+    }
+
+    entry.lastDeposit = parseFloat(newDeposit);
+    entry.total += parseFloat(newDeposit);
+    updateTables();
+}
+
+
+
+
+
+
+	
+
 	function saveDataToLocalStorage() {
     localStorage.setItem('savingsData', JSON.stringify(savingsData));
 }
@@ -442,10 +499,25 @@ function addSavings(role) {
         updateTables(); 
     }
 
-    function updateData(index, field, value) {
-        savingsData[index][field] = value;
-        updateTables();
+    function deleteEntry() {
+    let role = document.getElementById("userRole").value;
+    if (role !== "admin") {
+        alert("You don't have permission to delete!");
+        return;
     }
+
+    let sn = prompt("Enter Serial Number (SN) of the entry to delete:");
+    let index = savingsData.findIndex(item => item.sn == sn);
+
+    if (index === -1) {
+        alert("Entry not found!");
+        return;
+    }
+
+    savingsData.splice(index, 1);
+    updateTables();
+}
+
 
     function updateDeposit(index, value) {
         if (isNaN(value) || parseFloat(value) < 0) return;
@@ -532,7 +604,20 @@ function addSavings(role) {
 
 
 
+function setPermissions() {
+    let role = document.getElementById("userRole").value;
+    
+    document.getElementById("addBtn").style.display = (role === "admin" || role === "updater") ? "block" : "none";
+    document.getElementById("editBtn").style.display = (role === "admin" || role === "updater") ? "block" : "none";
+    document.getElementById("deleteBtn").style.display = (role === "admin") ? "block" : "none";
+}
 
+// Call this function on page load to apply permissions initially
+window.onload = setPermissions;
+
+
+
+	    
 	
 		
 		
