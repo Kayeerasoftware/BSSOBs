@@ -370,15 +370,15 @@
 
     savingsData.forEach((data, index) => {
         let row = `<tr>
-            <td>${index + 1}</td>
-            <td>${data.firstName}</td>
-            <td>${data.lastName}</td>
-            <td>${data.account}</td>
-            <td>${data.lastDeposit}</td>
-            <td>${data.total}</td>
+                        <td>${data.sn}</td>
+                        <td contenteditable="${isEditable('firstName', index)}" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
+                        <td contenteditable="${isEditable('lastName', index)}" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
+                        <td>${data.account}</td>
+                        <td contenteditable="${isEditable('lastDeposit', index)}" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
+                        <td>${data.total}</td>
             <td>
-                <button onclick="deleteEntry(${index})" class="btn btn-danger">Delete</button>
            	<td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
+	    	<button onclick="deleteEntry(${index})" class="btn btn-danger">Delete</button>
 	    </td>
         </tr>`;
 
