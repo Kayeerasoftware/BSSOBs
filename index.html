@@ -323,13 +323,14 @@
         return;
     }
 
-    let newEntry = {
-        sn: Math.floor(Math.random() * 10000),
-        firstName,
-        lastName,
-        account: Math.floor(100000 + Math.random() * 900000),
-        lastDeposit,
-        total: lastDeposit
+        let newEntry = { 
+            sn: savingsData.length + 1, 
+            firstName, 
+            lastName, 
+            account: Math.floor(100000 + Math.random() * 900000), 
+            lastDeposit: parseFloat(lastDeposit), 
+            total: parseFloat(lastDeposit),
+            lastDepositChanged: false
     };
 
     savingsData.push(newEntry);
