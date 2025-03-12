@@ -3,127 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savings Database</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <title>Google Sheets Database</title>
 </head>
 <body>
-    <h2>Group Savings Database</h2>
-    <input type="file" id="upload" accept=".xlsx" />
-    <button onclick="clearDatabase()">Clear Database</button>
-    <table id="dataTable">
+    <h1>Google Sheets Data</h1>
+    <table border="1">
         <thead>
-            <tr id="tableHead"></tr>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
         </thead>
-        <tbody id="tableBody"></tbody>
+        <tbody id="data-table">
+        </tbody>
     </table>
-    
+
     <script>
-        let db;
-        
-        document.addEventListener("DOMContentLoaded", () => {
-            let request = indexedDB.open("SavingsDB", 1);
-            
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
-                let store = db.createObjectStore("savings", { keyPath: "id", autoIncrement: true });
-                store.createIndex("data", "data", { unique: false });
-            };
-            
-            request.onsuccess = function(event) {
-                db = event.target.result;
-                loadStoredData();
-            };
-        });
-        
-        document.getElementById('upload').addEventListener('change', function(event) {
-            let file = event.target.files[0];
-            let reader = new FileReader();
-            
-            reader.onload = function(e) {
-                let data = new Uint8Array(e.target.result);
-                let workbook = XLSX.read(data, { type: 'array' });
-                let sheetName = workbook.SheetNames[0];
-                let sheet = workbook.Sheets[sheetName];
-                let jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                storeData(jsonData);
-            };
-            
-            reader.readAsArrayBuffer(file);
-        });
-        
-        function storeData(data) {
-            let transaction = db.transaction(["savings"], "readwrite");
-            let store = transaction.objectStore("savings");
-            store.clear();
-            store.add({ id: 1, data: data });
-            transaction.oncomplete = () => loadStoredData();
-        }
-        
-        function loadStoredData() {
-            let transaction = db.transaction(["savings"], "readonly");
-            let store = transaction.objectStore("savings");
-            let request = store.get(1);
-            
-            request.onsuccess = function() {
-                if (request.result) {
-                    displayData(request.result.data);
-                }
-            };
-        }
-        
-        function displayData(data) {
-            let tableHead = document.getElementById('tableHead');
-            let tableBody = document.getElementById('tableBody');
-            
-            tableHead.innerHTML = '';
-            tableBody.innerHTML = '';
-            
-            if (data.length > 0) {
-                let headerRow = document.createElement('tr');
-                data[0].forEach(header => {
-                    let th = document.createElement('th');
-                    th.textContent = header;
-                    headerRow.appendChild(th);
+        const sheetURL = "https://script.google.com/macros/s/AKfycbyXnOcST4ha1bu_v6FK7wwyVyOfuBkRnTo1ksQuFLlykqVGu-dmpF4uQ7ua9Y2aDeYT/exec";
+
+        async function fetchData() {
+            try {
+                const response = await fetch(sheetURL);
+                const data = await response.json();
+                const tableBody = document.getElementById("data-table");
+
+                data.forEach(row => {
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${row.ID}</td><td>${row.Name}</td><td>${row.Email}</td>`;
+                    tableBody.appendChild(tr);
                 });
-                tableHead.appendChild(headerRow);
-            }
-            
-            for (let i = 1; i < data.length; i++) {
-                let row = document.createElement('tr');
-                data[i].forEach(cell => {
-                    let td = document.createElement('td');
-                    td.textContent = cell;
-                    row.appendChild(td);
-                });
-                tableBody.appendChild(row);
+            } catch (error) {
+                console.error("Error fetching data:", error);
             }
         }
-        
-        function clearDatabase() {
-            let transaction = db.transaction(["savings"], "readwrite");
-            let store = transaction.objectStore("savings");
-            store.clear();
-            document.getElementById('tableHead').innerHTML = '';
-            document.getElementById('tableBody').innerHTML = '';
-        }
+
+        fetchData();
     </script>
 </body>
 </html>
