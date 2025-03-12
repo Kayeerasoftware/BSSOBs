@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savings Data</title>
+    <title>Savings Database</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body {
@@ -25,8 +25,9 @@
     </style>
 </head>
 <body>
-    <h2>Group Savings Data</h2>
+    <h2>Group Savings Database</h2>
     <input type="file" id="upload" accept=".xlsx" />
+    <button onclick="clearDatabase()">Clear Database</button>
     <table id="dataTable">
         <thead>
             <tr id="tableHead"></tr>
@@ -35,6 +36,23 @@
     </table>
     
     <script>
+        let db;
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            let request = indexedDB.open("SavingsDB", 1);
+            
+            request.onupgradeneeded = function(event) {
+                db = event.target.result;
+                let store = db.createObjectStore("savings", { keyPath: "id", autoIncrement: true });
+                store.createIndex("data", "data", { unique: false });
+            };
+            
+            request.onsuccess = function(event) {
+                db = event.target.result;
+                loadStoredData();
+            };
+        });
+        
         document.getElementById('upload').addEventListener('change', function(event) {
             let file = event.target.files[0];
             let reader = new FileReader();
@@ -45,11 +63,31 @@
                 let sheetName = workbook.SheetNames[0];
                 let sheet = workbook.Sheets[sheetName];
                 let jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                displayData(jsonData);
+                storeData(jsonData);
             };
             
             reader.readAsArrayBuffer(file);
         });
+        
+        function storeData(data) {
+            let transaction = db.transaction(["savings"], "readwrite");
+            let store = transaction.objectStore("savings");
+            store.clear();
+            store.add({ id: 1, data: data });
+            transaction.oncomplete = () => loadStoredData();
+        }
+        
+        function loadStoredData() {
+            let transaction = db.transaction(["savings"], "readonly");
+            let store = transaction.objectStore("savings");
+            let request = store.get(1);
+            
+            request.onsuccess = function() {
+                if (request.result) {
+                    displayData(request.result.data);
+                }
+            };
+        }
         
         function displayData(data) {
             let tableHead = document.getElementById('tableHead');
@@ -77,6 +115,14 @@
                 });
                 tableBody.appendChild(row);
             }
+        }
+        
+        function clearDatabase() {
+            let transaction = db.transaction(["savings"], "readwrite");
+            let store = transaction.objectStore("savings");
+            store.clear();
+            document.getElementById('tableHead').innerHTML = '';
+            document.getElementById('tableBody').innerHTML = '';
         }
     </script>
 </body>
