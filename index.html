@@ -1,96 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sheets Database</title>
-</head>
-<body>
-    <h1>Google Sheets Data</h1>
+const express = require('express');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+require('dotenv').config();
 
-    <!-- Form to add new data -->
-    <form id="data-form">
-        <label for="id">ID:</label>
-        <input type="number" id="id" required><br>
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-        <label for="name">Name:</label>
-        <input type="text" id="name" required><br>
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" required><br>
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  role: { type: String, enum: ['User', 'Treasurer', 'Admin'], default: 'User' }
+});
 
-        <button type="submit">Add Data</button>
-    </form>
+const SavingsSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  amount: Number,
+  date: { type: Date, default: Date.now }
+});
 
-    <h2>Stored Data</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody id="data-table">
-        </tbody>
-    </table>
+const User = mongoose.model('User', UserSchema);
+const Savings = mongoose.model('Savings', SavingsSchema);
 
-    <script>
-        const sheetURL = "https://script.google.com/macros/s/AKfycbxpzAbfQ2FTFYXD-Yd83QrysBM9eCv4zIpHKNiwMO40Dvi9E5-Kp8QTZkpUAz_n3eL9/exec";
+app.post('/register', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ name, email, password: hashedPassword, role });
+    await user.save();
+    res.status(201).json({ message: 'User registered' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-        // Fetch data from Google Sheets
-        async function fetchData() {
-            try {
-                const response = await fetch(sheetURL);
-                const data = await response.json();
-                const tableBody = document.getElementById("data-table");
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'User not found' });
+    
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+    
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token, user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-                tableBody.innerHTML = ""; // Clear previous table data
-
-                data.forEach(row => {
-                    let tr = document.createElement("tr");
-                    tr.innerHTML = `<td>${row.ID}</td><td>${row.Name}</td><td>${row.Email}</td>`;
-                    tableBody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        }
-
-        // Add data to Google Sheets
-        document.getElementById("data-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const id = document.getElementById("id").value;
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-
-            const data = { ID: id, Name: name, Email: email };
-
-            try {
-                const response = await fetch(sheetURL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data),
-                });
-
-                const result = await response.json();
-                console.log(result);
-
-                if (result.status === "Success") {
-                    alert("Data added successfully!");
-                    fetchData(); // Reload data
-                } else {
-                    alert("Error adding data.");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Error adding data.");
-            }
-        });
-
-        // Load data on page load
-        fetchData();
-    </script>
-</body>
-</html>
+app.listen(5000, () => console.log('Server running on port 5000'));
