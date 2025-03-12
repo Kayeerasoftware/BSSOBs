@@ -381,15 +381,17 @@ console.log(generateAccountNumber()); // Example output: BSSOB/G453X
     document.getElementById('adminTable').innerHTML = '';
 
     savingsData.forEach((data, index) => {
-        let row = <tr>
+        let row = '<tr>
                         <td>${data.sn}</td>
                         <td contenteditable="true" onblur="updateData(${index}, 'firstName', this.innerText)" class="editable">${data.firstName}</td>
                         <td contenteditable="true" onblur="updateData(${index}, 'lastName', this.innerText)" class="editable">${data.lastName}</td>
                         <td>${data.account}</td>
                         <td contenteditable="true" onblur="updateDeposit(${index}, this.innerText)" class="editable">${data.lastDeposit}</td>
                         <td>${data.total}</td>
+	    		<td><button onclick="updateTotal(${index})" class="update-button ${data.lastDepositChanged ? 'update-pending' : 'update-completed'}">Update</button></td>
 
-                   </tr>;
+
+                   </tr>';
         let adminRow = row; // Start with the same row
 
         // Add delete button only for the Admin table
