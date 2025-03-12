@@ -432,19 +432,52 @@ function updateDeposit(index, newDeposit) {
     savingsData[index].lastDeposit = depositAmount;
     savingsData[index].total += depositAmount; // Update total savings
     localStorage.setItem("savingsData", JSON.stringify(savingsData)); // Save updated data
-    updateTables();
+    updateTables();	
 }
-    function updateTotal(index) {
-        if (!savingsData[index].lastDepositChanged) {
-            alert("No changes detected in Last Deposit.");
-            return;
-        }
 
-        let lastDeposit = savingsData[index].lastDeposit;
-        savingsData[index].total += lastDeposit;
-        savingsData[index].lastDepositChanged = false;
-        updateTables();
+	let lastDeposit = 0; // Store the last deposit value
+let userRole = "viewer"; // Change this dynamically ("admin", "updater", "viewer")
+
+// Function to track last deposit changes
+function trackLastDepositChange() {
+    let newLastDeposit = parseFloat(document.getElementById("lastDeposit").value) || 0;
+
+    if (newLastDeposit !== lastDeposit) {
+        document.getElementById("updateTotalBtn").disabled = false; // Enable button
+    } else {
+        document.getElementById("updateTotalBtn").disabled = true; // Disable button
     }
+}
+	
+	
+	
+// Function to update the total
+function updateTotal() {
+    if (userRole !== "admin" && userRole !== "updater") {
+        alert("You do not have permission to update the total.");
+        return;
+    }
+
+    let confirmUpdate = confirm("Are you sure you want to update the total?");
+    if (!confirmUpdate) return;
+
+    let newLastDeposit = parseFloat(document.getElementById("lastDeposit").value) || 0;
+    let previousTotal = parseFloat(document.getElementById("totalAmount").innerText) || 0;
+
+    let newTotal = previousTotal + (newLastDeposit - lastDeposit);
+    document.getElementById("totalAmount").innerText = newTotal.toFixed(2);
+
+    lastDeposit = newLastDeposit; // Update stored last deposit
+    document.getElementById("updateTotalBtn").disabled = true; // Disable button after update
+}
+
+// Attach event listeners
+document.getElementById("lastDeposit").addEventListener("input", trackLastDepositChange);
+document.getElementById("updateTotalBtn").addEventListener("click", updateTotal);
+
+// Initial check to disable button
+trackLastDepositChange();
+	
 
 // Function to delete an entry (only Admin should have access)
 function deleteEntry(index) {
