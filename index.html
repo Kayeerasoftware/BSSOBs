@@ -123,39 +123,30 @@
     <script>
         const scriptURL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxx5oaWiXpsXDG9gQb6Xc4QtzDWBYDNw6qABWzMoyuMZMq0zAo3vtCoe1UX4ZKddWKY/exec/exec/exec';
 
-        function submitForm() {
-            let formData = {
-                firstSn: document.getElementById("firstSn").value,
-                name: document.getElementById("name").value,
-                lastName: document.getElementById("lastName").value,
-                phoneNumber: document.getElementById("phoneNumber").value,
-                accountNumber: document.getElementById("accountNumber").value,
-                deposit: document.getElementById("deposit").value,
-                amount: document.getElementById("amount").value,
-                email: document.getElementById("email").value
-            };
+function submitForm() {
+    let formData = {
+        firstSn: document.getElementById("firstSn").value,
+        name: document.getElementById("name").value,
+        lastName: document.getElementById("lastName").value,
+        phoneNumber: document.getElementById("phoneNumber").value,
+        accountNumber: document.getElementById("accountNumber").value,
+        deposit: document.getElementById("deposit").value,
+        amount: document.getElementById("amount").value,
+        email: document.getElementById("email").value
+    };
 
-            fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === "success") {
-                    document.querySelector('.success').style.display = "block";
-                    document.querySelector('.error').style.display = "none";
-                    loadTableData(); // Refresh table
-                } else {
-                    document.querySelector('.error').style.display = "block";
-                    document.querySelector('.success').style.display = "none";
-                }
-            })
-            .catch(() => {
-                document.querySelector('.error').style.display = "block";
-                document.querySelector('.success').style.display = "none";
-            });
-        }
+    console.log(formData); // Check if data is correct
+
+    fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => console.log(data)) // Check response
+    .catch(error => console.error('Error:', error));
+}
+
 
         function loadTableData() {
             fetch(scriptURL + '?action=read')
