@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deposit Form</title>
+    <title>Deposit Form & Records</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #6e8efb, #a777e3);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 20px;
         }
         .container {
             background: white;
@@ -22,9 +22,9 @@
             width: 100%;
             max-width: 400px;
             text-align: center;
+            margin-bottom: 20px;
         }
         h2 {
-            margin-bottom: 20px;
             color: #333;
         }
         input, button {
@@ -57,6 +57,29 @@
             background: #f8d7da;
             color: #721c24;
         }
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #6e8efb;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -76,7 +99,30 @@
         <div class="error">Submission failed! Please try again.</div>
     </div>
 
+    <div class="table-container">
+        <h2>Deposit Records</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>First Sn.</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone Number</th>
+                    <th>Account Number</th>
+                    <th>Deposit</th>
+                    <th>Amount</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
     <script>
+        const scriptURL = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbzdcwzSvyW2Ob085NGt09tewKMoFLDsZhPYR9Nyh1FGXMf8LpxjgT6OTgl9B8Z5gSI/exec/exec';
+
         function submitForm() {
             let formData = {
                 firstSn: document.getElementById("firstSn").value,
@@ -89,18 +135,17 @@
                 email: document.getElementById("email").value
             };
 
-            fetch('https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbz1MAyJAF2VEjlJvf_EFphfypsuTGRJAmU2T4fxwjQIGaebQ4xe9ZpiXmPKUj-S8Byv/exec/exec', {
+            fetch(scriptURL, {
                 method: 'POST',
                 body: JSON.stringify(formData),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.result === "success") {
                     document.querySelector('.success').style.display = "block";
                     document.querySelector('.error').style.display = "none";
+                    loadTableData(); // Refresh table
                 } else {
                     document.querySelector('.error').style.display = "block";
                     document.querySelector('.success').style.display = "none";
@@ -111,6 +156,27 @@
                 document.querySelector('.success').style.display = "none";
             });
         }
+
+        function loadTableData() {
+            fetch(scriptURL + '?action=read')
+            .then(response => response.json())
+            .then(data => {
+                let tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = '';
+                data.forEach(row => {
+                    let tr = document.createElement('tr');
+                    row.forEach(cell => {
+                        let td = document.createElement('td');
+                        td.textContent = cell;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+            });
+        }
+
+        // Load data on page load
+        window.onload = loadTableData;
     </script>
 
 </body>
