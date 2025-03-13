@@ -1,62 +1,117 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
-require('dotenv').config();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #6e8efb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5a7ae0;
+        }
+        .success, .error {
+            display: none;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+    <div class="container">
+        <h2>Deposit Form</h2>
+        <input type="text" id="firstSn" placeholder="First Sn." required>
+        <input type="text" id="name" placeholder="First Name" required>
+        <input type="text" id="lastName" placeholder="Last Name" required>
+        <input type="tel" id="phoneNumber" placeholder="Phone Number" required>
+        <input type="text" id="accountNumber" placeholder="Account Number" required>
+        <input type="text" id="deposit" placeholder="Deposit Type" required>
+        <input type="number" id="amount" placeholder="Amount" required>
+        <input type="email" id="email" placeholder="Email Address" required>
+        <button onclick="submitForm()">Submit</button>
+        <div class="success">Data submitted successfully!</div>
+        <div class="error">Submission failed! Please try again.</div>
+    </div>
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+    <script>
+        function submitForm() {
+            let formData = {
+                firstSn: document.getElementById("firstSn").value,
+                name: document.getElementById("name").value,
+                lastName: document.getElementById("lastName").value,
+                phoneNumber: document.getElementById("phoneNumber").value,
+                accountNumber: document.getElementById("accountNumber").value,
+                deposit: document.getElementById("deposit").value,
+                amount: document.getElementById("amount").value,
+                email: document.getElementById("email").value
+            };
 
-const UserSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-  role: { type: String, enum: ['User', 'Treasurer', 'Admin'], default: 'User' }
-});
+            fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "success") {
+                    document.querySelector('.success').style.display = "block";
+                    document.querySelector('.error').style.display = "none";
+                } else {
+                    document.querySelector('.error').style.display = "block";
+                    document.querySelector('.success').style.display = "none";
+                }
+            })
+            .catch(() => {
+                document.querySelector('.error').style.display = "block";
+                document.querySelector('.success').style.display = "none";
+            });
+        }
+    </script>
 
-const SavingsSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  amount: Number,
-  date: { type: Date, default: Date.now }
-});
-
-const User = mongoose.model('User', UserSchema);
-const Savings = mongoose.model('Savings', SavingsSchema);
-
-app.post('/register', async (req, res) => {
-  try {
-    const { name, email, password, role } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword, role });
-    await user.save();
-    res.status(201).json({ message: 'User registered' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'User not found' });
-    
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
-    
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, user });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.listen(5000, () => console.log('Server running on port 5000'));
+</body>
+</html>
