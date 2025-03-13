@@ -114,41 +114,40 @@
             return true;
         }
 
-function submitForm(retries = 3) {
-    if (!validateForm()) return;
+        function submitForm() {
+            if (!validateForm()) return;
 
-    let formData = new URLSearchParams({
-        firstSn: document.getElementById("firstSn").value,
-        name: document.getElementById("name").value,
-        lastName: document.getElementById("lastName").value,
-        phoneNumber: document.getElementById("phoneNumber").value,
-        accountNumber: document.getElementById("accountNumber").value,
-        deposit: document.getElementById("deposit").value,
-        amount: document.getElementById("amount").value,
-        email: document.getElementById("email").value
-    });
+            let formData = {
+                firstSn: document.getElementById("firstSn").value,
+                name: document.getElementById("name").value,
+                lastName: document.getElementById("lastName").value,
+                phoneNumber: document.getElementById("phoneNumber").value,
+                accountNumber: document.getElementById("accountNumber").value,
+                deposit: document.getElementById("deposit").value,
+                amount: document.getElementById("amount").value,
+                email: document.getElementById("email").value
+            };
 
-    fetch(scriptURL, { method: 'POST', body: formData })
-    .then(response => response.json())
-    .then(data => {
-        if (data.result === "success") {
-            document.querySelector(".success").style.display = "block";
-            document.querySelector(".error").style.display = "none";
-            loadTableData();
-        } else {
-            throw new Error("Invalid response from server");
+            fetch(scriptURL, {
+                method: 'POST',
+                body: new URLSearchParams(formData),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "success") {
+                    document.querySelector(".success").style.display = "block";
+                    document.querySelector(".error").style.display = "none";
+                    loadTableData();
+                } else {
+                    throw new Error("Invalid response from server");
+                }
+            })
+            .catch(error => {
+                document.querySelector(".error").textContent = "Submission failed: " + error.message;
+                document.querySelector(".error").style.display = "block";
+            });
         }
-    })
-    .catch(error => {
-        if (retries > 0) {
-            setTimeout(() => submitForm(retries - 1), 2000); // Retry after 2 seconds
-        } else {
-            document.querySelector(".error").textContent = "Submission failed: " + error.message;
-            document.querySelector(".error").style.display = "block";
-        }
-    });
-}
-
 
         function loadTableData() {
             fetch(scriptURL + '?action=read')
